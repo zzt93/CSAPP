@@ -135,6 +135,39 @@ int tsub_ok(int x, int y) {
     return !xmsb & ymsb & rmsb | xmsb & !ymsb & !rmsb;
 }
 
+float u2f(unsigned);
+/* 2.89
+   You have been assigned the task of writing a C function to compute a floating-
+point representation of 2 x . You decide that the best way to do this is to directly
+construct the IEEE single-precision representation of the result. When x is too
+small, your routine will return 0.0. When x is too large, it will return +∞
+ */
+float fpwr2(int x) {
+    /* Result exponent and fraction */
+    unsigned exp, frac;
+    unsigned u;
+    if (x < -149) {
+        /* Too small. Return 0.0 */
+        exp = 0;
+        frac = 0;
+    } else if (x < -126) {/* Denormalized result */
+        exp = 0;
+        frac = 1 << (23 - (-126 - x));
+    } else if (x < 128) {
+        /* Normalized result. */
+        exp = x - (-127);
+        frac = 0;
+    } else {
+        /* Too big. Return +oo */
+        exp = 256;
+        frac = 0;
+    }
+    /* Pack exp and frac into 32 bits */
+    u = exp << 23 | frac;
+    /* Return as float */
+    return u2f(u);
+}
+
 int main() {
     int i;
     for (i = 0; i < 4; i++) {
