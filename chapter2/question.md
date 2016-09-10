@@ -8,12 +8,12 @@
 
 note: 1{number} mean 'repeat `1` `number` times', e.g. 1.1{3} == 1.111
 
-- min denormalized: -1.1{frac - 1} * 2**(1-bias + - 1)
+- min denormalized: -0.1{frac} * 2**(1-bias)
 - min normalized: -1.1{frac} * 2**(bias)
 - max denormalized: - (min denormalized)
 - max normalized: - (min normalized)
-- closest denormalized: 2**(-frac + 1-bias)
-- closest normalized: 2**(1-bias)
+- denormalized closest to 0: 2**(-frac + 1-bias)
+- normalized closest to 0: 2**(1-bias)
 
 - float:
  - bias = 127
@@ -24,7 +24,7 @@ note: 1{number} mean 'repeat `1` `number` times', e.g. 1.1{3} == 1.111
 
 
 ### Harder
-#### what is the min integer that can't be represented by IEEE 754 float/double?
+#### what is the min positive integer that can't be represented by IEEE 754 float/double?
 [answer](http://stackoverflow.com/questions/3793838/which-is-the-first-integer-that-an-ieee-754-float-is-incapable-of-representing-e)
 
 #### how many integer can IEEE 754 float/double represent?
