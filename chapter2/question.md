@@ -4,7 +4,7 @@
 
 ### Basic
 
-#### min/max denormalized/normalized float/double, closest to 0 denormalized/normalized float/double(not include 0)
+#### min/max denormalized/normalized float/double, denormalized/normalized float/double(not include 0) 
 
 note: 1{number} mean 'repeat `1` `number` times', e.g. 1.1{3} == 1.111
 
@@ -25,6 +25,7 @@ note: 1{number} mean 'repeat `1` `number` times', e.g. 1.1{3} == 1.111
 
 ### Harder
 #### what is the min positive integer that can't be represented by IEEE 754 float/double?
-[answer](http://stackoverflow.com/questions/3793838/which-is-the-first-integer-that-an-ieee-754-float-is-incapable-of-representing-e)
+2^(frac + 1) + 1
+[explanation](http://stackoverflow.com/questions/3793838/which-is-the-first-integer-that-an-ieee-754-float-is-incapable-of-representing-e)
 
 #### how many integer can IEEE 754 float/double represent?
