@@ -26,5 +26,17 @@ From a programmer’s perspective, we can think of the Internet as a worldwide c
 #### 11.3.1 IP Address
 Because Internet hosts can have different host byte orders, TCP/IP defines a uniform network byte order (big-endian byte order) for any integer data item, such as an IP address, that is carried across the network in a packet header.
 
+#### 11.3.2 Internet Domain Names
+
+#### 11.3.3 Internet Connection
+
+Internet clients and servers communicate by sending and receiving streams of bytes over connections. A connection is point-to-point in the sense that it connects a pair of processes. It is full-duplex in the sense that data can flow in both directions at the same time. And it is reliable in the sense that—barring some catastrophic failure such as a cable cut by the proverbial careless backhoe operator—the stream of bytes sent by the source process is eventually received by the destination process in the same order it was sent.
+Internet clients and servers communicate by sending and receiving streams of bytes over connections. A connection is point-to-point in the sense that it connects a pair of processes. It is full-duplex in the sense that data can flow in both directions at the same time. And it is reliable in the sense that—barring some catastrophic failure such as a cable cut by the proverbial careless backhoe operator—the stream of bytes sent by the source process is eventually received by the destination process in the same order it was sent.
+
+###11.4 The Sockets Interface
+![overview](socket_overview.png)
+
+####11.4.1 Socket Address Structures
+From the perspective of the Unix kernel, a socket is an end point for communication. From the perspective of a Unix program, a socket is an open file with a corresponding descriptor.
 
 ##More: tcp-ip-illustrated-volume-1.pdf
