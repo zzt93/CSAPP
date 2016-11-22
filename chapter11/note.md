@@ -39,4 +39,31 @@ Internet clients and servers communicate by sending and receiving streams of byt
 ####11.4.1 Socket Address Structures
 From the perspective of the Unix kernel, a socket is an end point for communication. From the perspective of a Unix program, a socket is an open file with a corresponding descriptor.
 
-##More: tcp-ip-illustrated-volume-1.pdf
+```c
+/* Generic socket address structure (for connect, bind, and accept) */
+struct sockaddr {
+    unsigned short sa_family;/* Protocol family */
+    char sa_data[14]; /* Address data. */
+};
+/* Internet-style socket address structure */
+struct sockaddr_in {
+    unsigned short sin_family;
+    unsigned short sin_port; // 2 bytes
+    struct in_addr sin_addr; // 4 bytes
+    unsigned char sin_zero[8]; //padding
+};
+```
+
+####11.4.2 The socket Function
+The clientfd descriptor returned by socket is only partially opened and cannot yet be used for reading and writing.
+
+####11.4.5 The bind Function
+The bind function tells the kernel to associate the server’s socket address in my_addr with the socket descriptor sockfd.
+
+####11.4.6 The listen Function
+By default, the kernelassumes that a descriptor created by the socket function corresponds to an activesocket that will live on the client end of a connection. A server calls the listenfunction to tell the kernel that the descriptor will be used by a server instead of aclient.
+
+#### 11.4.8 The accept Function
+The accept function waits for a connection request from a client to arrive on the listening descriptor listenfd, then fills in the client’s socket address in addr, and returns a connected descriptor that can be used to communicate with the client using Unix I/O functions.
+
+##More: tcp-ip-illustrated-volume-1
