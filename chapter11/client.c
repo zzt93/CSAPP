@@ -8,14 +8,6 @@
 #include <strings.h>
 #include <network.h>
 
-/**
- * Returns: descriptor if OK, −1 on Unix error, −2 on DNS error
- * @param hostname
- * @param port
- * @return
- */
-int open_clientfd(char *hostname, int port);
-
 
 int open_clientfd(char *hostname, int port) {
     int clientfd;

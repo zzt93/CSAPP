@@ -61,9 +61,11 @@ The clientfd descriptor returned by socket is only partially opened and cannot y
 The bind function tells the kernel to associate the server’s socket address in my_addr with the socket descriptor sockfd.
 
 ####11.4.6 The listen Function
-By default, the kernelassumes that a descriptor created by the socket function corresponds to an activesocket that will live on the client end of a connection. A server calls the listenfunction to tell the kernel that the descriptor will be used by a server instead of aclient.
+By default, the kernel assumes that a descriptor created by the socket function corresponds to an active socket that will live on the client end of a connection. A server calls the listen function to tell the kernel that the descriptor will be used by a server instead of a client.
 
 #### 11.4.8 The accept Function
 The accept function waits for a connection request from a client to arrive on the listening descriptor listenfd, then fills in the client’s socket address in addr, and returns a connected descriptor that can be used to communicate with the client using Unix I/O functions.
 
+
+What does EOF on a connection mean? The idea of EOF is often confusing to students, especially in the context of Internet connections. First, we need to understand that there is no such thing as an EOF character. Rather, EOF is a condition that is detected by the kernel. An application finds out about the EOF condition when it receives a zero return code from the read function. For disk files, EOF occurs when the current file position exceeds the file length. For Internet connections, EOF occurs when a process closes its end of the connection. The process at the other end of the connection detects the EOF when it attempts to read past the last byte in the stream.
 ##More: tcp-ip-illustrated-volume-1
