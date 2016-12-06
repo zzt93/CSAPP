@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "client.h"
+#include "csapp.h"
 
 #define MAX 1024
 
@@ -19,14 +20,16 @@ int main(int argc, char **argv) {
     char *host = argv[1];
     port = atoi(argv[2]);
 
-    if ((clientfd = open_clientfd(host, port)) < 0) {
-        exit(0);
-    }
+    clientfd = Open_clientfd(host, port);
     rio_t rio;
-    rio_readinitb(&rio, clientfd);
+    Rio_readinitb(&rio, clientfd);
 
     char line[MAX];
-    while (fgets(line, MAX, stdin) != NULL) {
-        
+    while (Fgets(line, MAX, stdin) != NULL) {
+        Rio_writen(clientfd, line, strlen(line));
+        Rio_readlineb(&rio, line, MAX);
+        Fputs(line, stdout);
     }
+    Close(clientfd);
+    exit(0);
 }

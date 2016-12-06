@@ -31,7 +31,7 @@ Because Internet hosts can have different host byte orders, TCP/IP defines a uni
 #### 11.3.3 Internet Connection
 
 Internet clients and servers communicate by sending and receiving streams of bytes over connections. A connection is point-to-point in the sense that it connects a pair of processes. It is full-duplex in the sense that data can flow in both directions at the same time. And it is reliable in the sense that—barring some catastrophic failure such as a cable cut by the proverbial careless backhoe operator—the stream of bytes sent by the source process is eventually received by the destination process in the same order it was sent.
-Internet clients and servers communicate by sending and receiving streams of bytes over connections. A connection is point-to-point in the sense that it connects a pair of processes. It is full-duplex in the sense that data can flow in both directions at the same time. And it is reliable in the sense that—barring some catastrophic failure such as a cable cut by the proverbial careless backhoe operator—the stream of bytes sent by the source process is eventually received by the destination process in the same order it was sent.
+
 
 ###11.4 The Sockets Interface
 ![overview](socket_overview.png)
@@ -68,4 +68,13 @@ The accept function waits for a connection request from a client to arrive on th
 
 
 What does EOF on a connection mean? The idea of EOF is often confusing to students, especially in the context of Internet connections. First, we need to understand that there is no such thing as an EOF character. Rather, EOF is a condition that is detected by the kernel. An application finds out about the EOF condition when it receives a zero return code from the read function. For disk files, EOF occurs when the current file position exceeds the file length. For Internet connections, EOF occurs when a process closes its end of the connection. The process at the other end of the connection detects the EOF when it attempts to read past the last byte in the stream.
+
+###11.5 Web Servers
+####11.5.2 Web Content
+To Web clients and servers, content is a sequence of bytes with an associated MIME (Multipurpose Internet Mail Extensions) type
+
+Web servers provide content to clients in two different ways:
+
+- Fetch a disk file and return its contents to the client. The disk file is known as static content and the process of returning the file to the client is known as serving static content.
+- Run an executable file and return its output to the client. The output produced by the executable at run time is known as dynamic content, and the process of running the program and returning its output to the client is known as serving dynamic content.
 ##More: tcp-ip-illustrated-volume-1
