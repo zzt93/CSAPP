@@ -4,8 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "client.h"
-#include "csapp.h"
+#include "../csapp.h"
 
 #define MAX 1024
 
