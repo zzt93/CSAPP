@@ -78,5 +78,43 @@ Web servers provide content to clients in two different ways:
 - Fetch a disk file and return its contents to the client. The disk file is known as static content and the process of returning the file to the client is known as serving static content.
 - Run an executable file and return its output to the client. The output produced by the executable at run time is known as dynamic content, and the process of running the program and returning its output to the client is known as serving dynamic content.
 
+There are several points to understand about how servers interpret the suffix of a URL:
+- There are no standard rules for determining whether a URL refers to static or dynamic content. Each server has its own rules for the files it manages. A common approach is to identify a set of directories, such as cgi-bin, where all executables must reside.
+- The initial ‘/’ in the suffix does not denote the Unix root directory. Rather, it denotes the home directory for whatever kind of content is being requested. For example, a server might be configured so that all static content is stored in directory /usr/httpd/html and all dynamic content is stored in directory /usr/httpd/cgi-bin.
+- The minimal URL suffix is the ‘/’ character, which all servers expand to some default home page such as /index.html. This explains why it is possible to fetch the home page of a site by simply typing a domain name into the browser. The browser appends the missing ‘/’ to the URL and passes it to the server, which expands the ‘/’ to some default file name.
+
+####11.5.3 HTTP Transactions
+##### HTTP Requests
+```
+<method> <uri> <version>
+<header name>: <header data>
+```
+The Host header is used by proxy caches, which sometimes serve as intermediaries betweena browser and the origin server that manages the requested file. Multiple proxiescan exist between a client and an origin server in a so-called proxy chain. The datain the Host header, which identifies the domain name of the origin server, allows aproxy in the middle of a proxy chain to determine if it might have a locally cachedcopy of the requested content.
+
+##### HTTP Response
+```
+<version> <status code> <status message>
+response headers
+
+response body
+```
+
+#### 11.5.4 Serving Dynamic Content
+How does the client pass anyprogram arguments to the server? How does the server pass these argumentsto the child process that it creates? How does the server pass other informationto the child that it might need to generate the content? Where does the childsend its output? These questions are addressed by a de facto standard called CGI(Common Gateway Interface).
+
+#####How Does the Server Pass Arguments to the Child?
+After a server receives a request such as
+```
+GET /cgi-bin/adder?15000&213 HTTP/1.1
+```
+it calls fork to create a child process and calls execve to run the /cgi-bin/adderprogram in the context of the child. Programs like the adder program are oftenreferred to as CGI programs because they obey the rules of the CGI standard.And since many CGI programs are written as Perl scripts, CGI programs areoften called CGI scripts. Before the call to execve, the child process sets theCGI environment variable QUERY_STRING to “15000&213”, which the adderprogram can reference at run time using the Unix getenv function.
+
+#####Where Does the Child Send Its Output?
+A CGI program sends its dynamic content to the standard output. Before thechild process loads and runs the CGI program, it uses the Unix dup2 functionto redirect standard output to the connected descriptor that is associated withthe client. Thus, anything that the CGI program writes to standard output goesdirectly to the client.
+Notice that since the parent does not know the type or size of the content thatthe child generates, the child is responsible for generating the Content-type andContent-length response headers, as well as the empty line that terminates theheaders.
+
+For POST requests, the child would also need to redirect standard input to the connected descriptor. The CGI program would then read the arguments in the request body from standard input.
+
+### 11.6 The TINY Web Server
 
 ##More: [tcp-ip-illustrated-volume-1](tcp_ip_illustrated.md)
