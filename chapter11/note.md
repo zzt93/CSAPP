@@ -116,5 +116,14 @@ Notice that since the parent does not know the type or size of the content thatt
 For POST requests, the child would also need to redirect standard input to the connected descriptor. The CGI program would then read the arguments in the request body from standard input.
 
 ### 11.6 The TINY Web Server
+If a server writes to a connection that has already been closed by the client (say, because you clicked the “Stop” button on your browser), then the first such write returns normally, but the second write causes the delivery of a SIGPIPE signal whose default behavior is to terminate the process. If the SIGPIPE signal is caught or ignored, then the second write operation returns −1 with errno set to EPIPE. The strerr and perror functions report the EPIPEerror as a “Broken pipe”, a non-intuitive message that has confused generations of students.
+
+From a programmer’s point of view, we can think of the Internet as a worldwidecollection of hosts with the following properties:
+- Each Internet host has aunique 32-bit name called its IP address.
+- The set of IP addresses is mappedto a set of Internet domain names.
+- Processes on different Internet hosts cancommunicate with each other over connections.
+### 11.7 Summary
+
+
 
 ##More: [tcp-ip-illustrated-volume-1](tcp_ip_illustrated.md)

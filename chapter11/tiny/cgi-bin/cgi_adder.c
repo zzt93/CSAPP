@@ -4,7 +4,7 @@
 
 
 #include <stdlib.h>
-#include "csapp.h"
+#include "../../csapp.h"
 
 int main(void) {
     char *buf, *p;
