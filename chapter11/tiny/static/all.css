@@ -1,0 +1,34 @@
+.center-me {
+  margin: 0 auto;
+}
+
+.center-children {
+    margin: 20px auto;
+    text-align: center;
+    font-size: xx-large;
+}
+
+label{
+    display: inline-block;
+    margin: 8px 0 0;
+}
+
+input {
+    width: 100%;
+    height: 150%;
+    padding: 10px;
+}
+
+input[type=submit] {
+    background-color: hsl(8, 70%, 54%);
+    color: white;
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 18px;
+}
+
+body {
+    max-width: 800px;
+}

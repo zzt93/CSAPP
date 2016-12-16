@@ -122,6 +122,21 @@ From a programmer’s point of view, we can think of the Internet as a worldwide
 - Each Internet host has aunique 32-bit name called its IP address.
 - The set of IP addresses is mappedto a set of Internet domain names.
 - Processes on different Internet hosts cancommunicate with each other over connections.
+
+####Learn from TINY
+- HTTP is just a formatted socket communication, i.e. protocol
+    - request line & request header
+    - response line & response header & response body
+    - socket actually is also an formatted byte stream sent on data link
+- index.html is just a default file for '/'
+- favicon.ico is just default icon name in server home directory
+- because the combination of socket and normal file and stdin/stdout/stderr, web communication is just like reading/writing file
+- create server user to run server process to add permission control
+    - change server home owner
+    - when deploy, change file owner
+- first '/' in path is where server runs
+- when return file with wrong MIME type, make it not work
+    - when return css file with text/plain, it useless
 ### 11.7 Summary
 
 

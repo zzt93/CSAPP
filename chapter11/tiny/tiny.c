@@ -47,7 +47,9 @@ void doit(int fd) {
     Rio_readlineb(&rio, buf, MAXLINE);
     sscanf(buf, "%s %s %s", method, uri, version);
     printf("%s\n", buf);
-    if (strcasecmp(method, "GET")) {
+    if (strcasecmp(method, "HEAD") != 0) {
+
+    } else if (strcasecmp(method, "GET")) {
         clienterror(fd, method, "501", "Not Implemented",
                     "Tiny does not implement this method");
         return;
@@ -121,6 +123,10 @@ void get_filetype(char *filename, char *filetype) {
         strcpy(filetype, "image/gif");
     else if (strstr(filename, ".jpg"))
         strcpy(filetype, "image/jpeg");
+    else if (strstr(filename, ".mp4"))
+        strcpy(filetype, "video/mpeg");
+    else if (strstr(filename, ".css"))
+        strcpy(filetype, "text/css");
     else
         strcpy(filetype, "text/plain");
 }
