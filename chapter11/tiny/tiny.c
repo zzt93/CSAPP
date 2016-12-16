@@ -14,11 +14,15 @@ void read_requesthdrs(rio_t *ptr);
 
 int parse_uri(char *uri, char *filename, char *cgiargs);
 
-void serve_static(int fd, char *filename, __off_t size);
+void serve_static(int fd, char *filename, __off_t size, Method m);
 
-void server_dynamic(int fd, char *filename, char *cgiargs);
+void server_dynamic(int fd, char *filename, char *cgiargs, Method m);
 
 void get_filetype(char *filename, char *filetype);
+
+typedef enum {
+    GET, HEAD, POST
+} Method;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -47,8 +51,9 @@ void doit(int fd) {
     Rio_readlineb(&rio, buf, MAXLINE);
     sscanf(buf, "%s %s %s", method, uri, version);
     printf("%s\n", buf);
-    if (strcasecmp(method, "HEAD") != 0) {
-
+    Method m = GET;
+    if (strcasecmp(method, "HEAD") == 0) {
+        m = HEAD;
     } else if (strcasecmp(method, "GET")) {
         clienterror(fd, method, "501", "Not Implemented",
                     "Tiny does not implement this method");
@@ -71,24 +76,31 @@ void doit(int fd) {
                         "Tiny couldn't read the file");
             return;
         }
-        serve_static(fd, filename, sbuf.st_size);
+        serve_static(fd, filename, sbuf.st_size, m);
     } else {
         if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
             clienterror(fd, filename, "403", "Forbidden",
                         "Tiny couldn't run the CGI program");
             return;
         }
-        server_dynamic(fd, filename, cgiargs);
+        server_dynamic(fd, filename, cgiargs, m);
     }
 }
 
-void server_dynamic(int fd, char *filename, char *cgiargs) {
+void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
     char buf[MAXLINE], *emptylist[] = {NULL};
 
     sprintf(buf, "HTTP/1.0 200 OK\r\n");
     sprintf(buf, "%sServer: Tiny Web Server\r\n", buf);
     Rio_writen(fd, buf, strlen(buf));
-
+    switch (m) {
+        case HEAD:
+            return;
+        case GET:
+            break;
+        case POST:
+            ;
+    }
     if (Fork() == 0) {
         /* Real server would set all CGI vars here */
         setenv("QUERY_STRING", cgiargs, 1);
@@ -98,7 +110,7 @@ void server_dynamic(int fd, char *filename, char *cgiargs) {
     wait(NULL);
 }
 
-void serve_static(int fd, char *filename, __off_t size) {
+void serve_static(int fd, char *filename, __off_t size, Method m) {
     int srcfd;
     char *srcp, filetype[MAXLINE], buf[MAXBUF];
 
@@ -108,7 +120,14 @@ void serve_static(int fd, char *filename, __off_t size) {
     sprintf(buf, "%sContent-length: %d\r\n", buf, size);
     sprintf(buf, "%sContent-type: %s\r\n\r\n", buf, filetype);
     Rio_writen(fd, buf, strlen(buf));
-
+    switch (m) {
+        case HEAD:
+            return;
+        case GET:
+            break;
+        case POST:
+            ;
+    }
     srcfd = Open(filename, O_RDONLY, 0);
     srcp = Mmap(0, size, PROT_READ, MAP_PRIVATE, srcfd, 0);
     Close(srcfd);
