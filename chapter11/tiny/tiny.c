@@ -4,6 +4,7 @@
 
 
 #include "../csapp.h"
+#include "cgi-bin/tiny.h"
 
 void doit(int fd);
 
@@ -19,10 +20,6 @@ void serve_static(int fd, char *filename, __off_t size, Method m);
 void server_dynamic(int fd, char *filename, char *cgiargs, Method m);
 
 void get_filetype(char *filename, char *filetype);
-
-typedef enum {
-    GET, HEAD, POST
-} Method;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -97,13 +94,16 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
         case HEAD:
             return;
         case GET:
+            setenv("QUERY_STRING", cgiargs, 1);
             break;
         case POST:
-            ;
+            Dup2(fd, STDIN_FILENO);;
     }
     if (Fork() == 0) {
         /* Real server would set all CGI vars here */
-        setenv("QUERY_STRING", cgiargs, 1);
+        char me[4];
+        sprintf(me, "%d", m);
+        setenv(METHOD, me, 1);
         Dup2(fd, STDOUT_FILENO);
         Execve(filename, emptylist, environ);
     }
@@ -125,8 +125,7 @@ void serve_static(int fd, char *filename, __off_t size, Method m) {
             return;
         case GET:
             break;
-        case POST:
-            ;
+        case POST:;
     }
     srcfd = Open(filename, O_RDONLY, 0);
     srcp = Mmap(0, size, PROT_READ, MAP_PRIVATE, srcfd, 0);
