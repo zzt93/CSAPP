@@ -12,23 +12,32 @@
 #include "tiny.h"
 
 
-void get_args(char **args, int n) {
+int get_args(char **args, int n) {
     Method m = (Method) atoi(getenv(METHOD));
+    int count = 0;
     switch (m) {
         case POST:
-
+//            read_request_body();
             break;
         case GET: {
             char *buf, *p;
             if ((buf = getenv("QUERY_STRING")) != NULL) {
-                p = index(buf, '&');
-                *p = '\0';
-                strcpy(*args, buf);
-                strcpy(*(++args), p + 1);
+                while ((p = index(buf, '&')) != NULL && count < n) {
+                    *p = '\0';
+                    strcpy(*args, buf);
+                    args++;
+                    buf = p + 1;
+                    count++;
+                }
+                if (count < n) {
+                    strcpy(*args, buf);
+                    count++;
+                }
             }
-        }
             break;
+        }
         default:
             assert(false);
     }
+    return count;
 }

@@ -51,6 +51,8 @@ void doit(int fd) {
     Method m = GET;
     if (strcasecmp(method, "HEAD") == 0) {
         m = HEAD;
+    } else if (strcasecmp(method, "POST") == 0) {
+        m = POST;
     } else if (strcasecmp(method, "GET")) {
         clienterror(fd, method, "501", "Not Implemented",
                     "Tiny does not implement this method");
@@ -94,10 +96,12 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
         case HEAD:
             return;
         case GET:
-            setenv("QUERY_STRING", cgiargs, 1);
+            setenv(QUERY_STRING, cgiargs, 1);
             break;
         case POST:
-            Dup2(fd, STDIN_FILENO);;
+//            setenv(CONTENT_TYPE, )
+//            setenv(CONTENT_LEN)
+            Dup2(fd, STDIN_FILENO);
     }
     if (Fork() == 0) {
         /* Real server would set all CGI vars here */
