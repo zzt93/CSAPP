@@ -17,6 +17,8 @@ static char *const CONTENT_TYPE = "CONTENT_TYPE";
 
 static char *const CONTENT_LEN = "CONTENT_LEN";
 
-int get_args(char **args, int n);
+#define MAXLINE 1024
+int get_args(char args[][MAXLINE], int n);
+
 
 #endif //CSAPP_TINY_H
