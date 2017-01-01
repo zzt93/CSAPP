@@ -3,6 +3,7 @@
 //
 
 
+#include <assert.h>
 #include "../csapp.h"
 #include "cgi-bin/tiny.h"
 
@@ -21,6 +22,12 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m);
 
 void get_filetype(char *filename, char *filetype);
 
+void store_header(char *buf);
+
+void free_header_values();
+
+int get_header_index(char *header);
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
@@ -35,6 +42,16 @@ int main(int argc, char **argv) {
         connfd = Accept(listenfd, (SA *) &clientaddr, &clientlen);
         doit(connfd);
         Close(connfd);
+    }
+}
+
+static char *header_values[sizeof headers / sizeof headers[0]] ={};
+
+void free_header_values() {
+    for (int i = 0; i < sizeof headers / sizeof headers[0]; ++i) {
+        if (header_values[i] != NULL) {
+            free(header_values[i]);
+        }
     }
 }
 
@@ -84,6 +101,7 @@ void doit(int fd) {
         }
         server_dynamic(fd, filename, cgiargs, m);
     }
+    free_header_values();
 }
 
 void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
@@ -99,8 +117,9 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
             setenv(QUERY_STRING, cgiargs, 1);
             break;
         case POST:
+            // todo set by reading header info
 //            setenv(CONTENT_TYPE, )
-//            setenv(CONTENT_LEN)
+            setenv(CONTENT_LEN, header_values[get_header_index(CONTENT_LEN)], 1);
             Dup2(fd, STDIN_FILENO);
     }
     if (Fork() == 0) {
@@ -112,6 +131,15 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
         Execve(filename, emptylist, environ);
     }
     wait(NULL);
+}
+
+int get_header_index(char *header) {
+    for (int i = 0; i < sizeof headers / sizeof headers[0]; ++i) {
+        if (strcasecmp(headers[i], header) == 0) {
+            return i;
+        }
+    }
+    assert(0);
 }
 
 void serve_static(int fd, char *filename, __off_t size, Method m) {
@@ -129,7 +157,8 @@ void serve_static(int fd, char *filename, __off_t size, Method m) {
             return;
         case GET:
             break;
-        case POST:;
+        case POST:
+            assert(0);
     }
     srcfd = Open(filename, O_RDONLY, 0);
     srcp = Mmap(0, size, PROT_READ, MAP_PRIVATE, srcfd, 0);
@@ -185,6 +214,23 @@ void read_requesthdrs(rio_t *ptr) {
     while (strcmp(buf, "\r\n")) {
         Rio_readlineb(ptr, buf, MAXLINE);
         printf("%s", buf);
+        store_header(buf);
+    }
+}
+
+
+void store_header(char *buf) {
+    char *p = index(buf, ':');
+    if (p == NULL) {
+        return;
+    }
+    *p = '\0';
+    for (int i = 0; i < sizeof headers / sizeof headers[0]; ++i) {
+        if (strcasecmp(headers[i], buf) == 0) {
+            char *res = malloc(strlen(p + 1) + 1);
+            strcpy(res, p + 1);
+            header_values[i] = res;
+        }
     }
 }
 

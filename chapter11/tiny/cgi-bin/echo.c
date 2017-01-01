@@ -3,24 +3,22 @@
 //
 #include <stdlib.h>
 #include <string.h>
-#include "../../csapp.h"
+#include "tiny.h"
 
 
 int main(void) {
     char *buf, *p;
-    char arg1[MAXLINE], content[MAXLINE];
-    if ((buf = getenv("QUERY_STRING")) != NULL) {
-        p = strchr(buf, '&');
-        if (p != NULL) {
-            *p = '\0';
-        }
-        strcpy(arg1, buf);
+    int len = 1;
+    char arg[len][MAXLINE], content[MAXLINE];
+    int c = get_args(arg, len);
+    if (c != len) {
+        exit(1);
     }
 
     sprintf(content, "Welcome to Tiny: ");
     sprintf(content, "%sThe Internet echo portal. \r\n<p>", content);
     sprintf(content, "%sThe query is %s\r\n<p>",
-            content, arg1);
+            content, arg[0]);
     sprintf(content, "%sThanks for visiting!\r\n", content);
 
     printf("Content-length: %d\r\n", (int) strlen(content));

@@ -17,7 +17,13 @@ static char *const CONTENT_TYPE = "CONTENT_TYPE";
 
 static char *const CONTENT_LEN = "CONTENT_LEN";
 
-#define MAXLINE 1024
+#define CONTENT_TYPE "Content-Type"
+#define CONTENT_LEN "Content-Length"
+
+static char *headers[] = {CONTENT_LEN, CONTENT_TYPE};
+
+#include "../../csapp.h"
+
 int get_args(char args[][MAXLINE], int n);
 
 

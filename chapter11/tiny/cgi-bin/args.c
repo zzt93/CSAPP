@@ -19,8 +19,10 @@ int get_args(char args[][MAXLINE], int n) {
     char *buf = NULL;
     switch (m) {
         case POST: {
-            size_t len = 0;
-            if ((getline(&buf, &len, stdin)) != -1) {
+            // request body end without a newline, so can't use getline
+            size_t len = (size_t) atoi(getenv(CONTENT_LEN)) + 1;
+            buf = malloc(len);
+            if ((read(STDIN_FILENO, buf, len)) > 0) {
                 count = copy_args(args, n, buf);
             }
             free(buf);
@@ -62,7 +64,7 @@ int copy_args(char args[][MAXLINE], int n, char *a) {
     return count;
 }
 
-//#ifdef test
+#ifdef test
 
 int main() {
     char me[4];
@@ -83,4 +85,4 @@ int main() {
 //    count = get_args(res, len);
 //    assert(count == 3);
 }
-//#endif
+#endif
