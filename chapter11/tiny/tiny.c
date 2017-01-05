@@ -31,7 +31,10 @@ int get_header_index(char *header);
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
+        exit(0);
     }
+//    A child created via fork(2) inherits a copy of its parent's signal dispositions.
+    signal(SIGPIPE, SIG_IGN);
 
     int port = atoi(argv[1]);
     int listenfd = Open_listenfd(port);
@@ -45,7 +48,7 @@ int main(int argc, char **argv) {
     }
 }
 
-static char *header_values[sizeof headers / sizeof headers[0]] ={};
+static char *header_values[sizeof headers / sizeof headers[0]] = {};
 
 void free_header_values() {
     for (int i = 0; i < sizeof headers / sizeof headers[0]; ++i) {
@@ -117,7 +120,6 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
             setenv(QUERY_STRING, cgiargs, 1);
             break;
         case POST:
-            // todo set by reading header info
 //            setenv(CONTENT_TYPE, )
             setenv(CONTENT_LEN, header_values[get_header_index(CONTENT_LEN)], 1);
             Dup2(fd, STDIN_FILENO);
@@ -128,6 +130,11 @@ void server_dynamic(int fd, char *filename, char *cgiargs, Method m) {
         sprintf(me, "%d", m);
         setenv(METHOD, me, 1);
         Dup2(fd, STDOUT_FILENO);
+        /*
+         * During  an  execve(2), the dispositions of handled signals
+         * are reset to the default; the dispositions of ignored signals
+         * are left unchanged.
+         */
         Execve(filename, emptylist, environ);
     }
     wait(NULL);
@@ -190,7 +197,7 @@ int parse_uri(char *uri, char *filename, char *cgiargs) {
         strcpy(filename, ".");
         strcat(filename, uri);
         if (uri[strlen(uri) - 1] == '/') {
-            strcat(filename, "home.html");
+            strcat(filename, "index.html");
         }
         return 1;
     } else {

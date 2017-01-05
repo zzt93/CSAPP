@@ -510,6 +510,20 @@ ssize_t rio_readn(int fd, void *usrbuf, size_t n) {
 /* $end rio_readn */
 
 /*
+ * may cause SIGPIPE signals and EPIPE errors that occur
+ * when the write function attempts to write to a prematurely closed connection.
+ * e.g. Program received signal SIGPIPE, Broken pipe
+ * <p>
+ * if a server writes to a connection that has already been closed by the client
+ * (say, because you clicked the “Stop” button on your browser), then the first
+ * such write returns normally, but the second write causes the delivery of a SIGPIPE signal
+ * whose default behavior is to terminate the process. If the SIGPIPE signal is caught or ignored,
+ * then the second write operation returns −1 with errno set to EPIPE.
+ * The strerr and perror functions report the EPIPE error as a “Broken pipe”,
+ * a non-intuitive message that has confused generations of students. The bottom line
+ * is that a robust server must catch these SIGPIPE signals and
+ * check write function calls for EPIPE errors.
+ * <p>
  * rio_writen - robustly write n bytes (unbuffered)
  */
 /* $begin rio_writen */
@@ -520,10 +534,15 @@ ssize_t rio_writen(int fd, void *usrbuf, size_t n) {
 
     while (nleft > 0) {
         if ((nwritten = write(fd, bufp, nleft)) <= 0) {
-            if (errno == EINTR)  /* Interrupted by sig handler return */
+            if (errno == EINTR) {
+
+                /* Interrupted by sig handler return */
                 nwritten = 0;    /* and call write() again */
-            else
+            } else if (errno == EPIPE) {
+                return n;
+            } else {
                 return -1;       /* errno set by write() */
+            }
         }
         nleft -= nwritten;
         bufp += nwritten;
